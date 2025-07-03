@@ -68,7 +68,7 @@ CREATE TABLE IF NOT EXISTS `upload_files` (
     -- ATTACHMENT: 트레이너 첨부파일 (계약서 등), INFO: 트레이너 긴 소개 파일, LICENCE: 트레이너 자격증
     -- BOARD: 커뮤니티 첨부파일
     
-    INDEX idx_targe (target_id, target_type)
+    INDEX idx_target (target_id, target_type)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 ALTER TABLE `users`
