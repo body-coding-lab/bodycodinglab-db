@@ -33,6 +33,72 @@ CREATE TABLE IF NOT EXISTS `users` (
 	CONSTRAINT ck_users_gender CHECK (gender IN ('MALE', 'FEMALE'))
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `members`(
+	id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    user_id BIGINT NOT NULL,
+    member_address VARCHAR(255) NOT NULL,
+    one_day_ticket_count TINYINT DEFAULT 3,
+    member_status VARCHAR(30) NOT NULL,
+    
+    CONSTRAINT fk_members_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT ck_members_member_status CHECK (member_status IN ('NOT_SUBSCRIPTION', 'SUBSCRIPTION'))
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `subscriptions`(
+	id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    member_id BIGINT NOT NULL,
+    price INT NOT NULL,
+    payment_date DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    
+    CONSTRAINT fk_subscriptions_member_id FOREIGN KEY (member_id) REFERENCES members(id)
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `payments`(
+	id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    payment_key VARCHAR(255), 
+    order_id VARCHAR(255) NOT NULL,
+    amount INT NOT NULL,
+    payment_status VARCHAR(50) NOT NULL,
+    payment_method VARCHAR(50) NOT NULL,
+    member_id BIGINT NOT NULL,
+    subscription_id BIGINT,
+	
+    CONSTRAINT uq_payments_payment_key UNIQUE (payment_key),
+    CONSTRAINT uq_payments_order_id UNIQUE (order_id),
+    CONSTRAINT uq_payments_subscription_id UNIQUE (subscription_id),
+    CONSTRAINT fk_payments_member_id FOREIGN KEY (member_id) REFERENCES members(id),
+    CONSTRAINT fk_payments_subscription_id FOREIGN KEY (subscription_id) REFERENCES subscriptions(id),
+    CONSTRAINT ck_payments_payment_status CHECK (payment_status IN ('READY', 'SUCCESS', 'FAIL')),
+    CONSTRAINT ck_payments_payment_method CHECK(payment_method IN ('KAKAO_PAY'))
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `match_waiting_list`(
+	id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    member_id BIGINT NOT NULL,
+    trainer_id BIGINT NOT NULL,
+    applied_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    approved_status VARCHAR(50) NOT NULL,
+    reject_response TEXT,
+    
+    CONSTRAINT uq_match_waiting_list_member_id UNIQUE (member_id),
+    CONSTRAINT fk_match_waiting_list_member_id FOREIGN KEY (member_id) REFERENCES user(id) ON DELETE CASCADE,
+    CONSTRAINT fk_match_waiting_list_trainer_id FOREIGN KEY (trainer_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT ck_match_waiting_list_approved_status CHECK (approved_status IN ('NOT_APPROVED', 'APPROVED', 'REJECT'))
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `matches`(
+	id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    member_id BIGINT NOT NULL,
+    trainer_id BIGINT NOT NULL,
+    match_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    is_maintained BOOLEAN DEFAULT TRUE,
+    
+    CONSTRAINT uq_matches_member_id UNIQUE (member_id),
+    CONSTRAINT uq_matches_member_id_trainer_id UNIQUE (member_id, trainer_id),
+    CONSTRAINT fk_matches_member_id FOREIGN KEY (member_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_matches_trainer_id FOREIGN KEY (trainer_id) REFERENCES users(id) ON DELETE CASCADE
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS `one_day_tickets` (
 	id BIGINT PRIMARY KEY AUTO_INCREMENT,
     member_id BIGINT NOT NULL,
@@ -48,6 +114,55 @@ CREATE TABLE IF NOT EXISTS `one_day_tickets` (
     CONSTRAINT fk_one_day_tickets_member_id FOREIGN KEY (member_id) REFERENCES users(id),
     CONSTRAINT fk_one_day_tickets_trainer_id FOREIGN KEY (trainer_id) REFERENCES users(id),
     CONSTRAINT ck_one_day_tickets_status CHECK (status IN ('ISSUED', 'USED', 'CANCELLED'))
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `coupons`(
+	id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    member_id BIGINT NOT NULL,
+    trainer_id BIGINT NOT NULL,
+	expiration_period DATE NOT NULL,
+    used_date TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    coupon_status VARCHAR(50) NOT NULL,
+    
+    CONSTRAINT fk_coupons_member_id FOREIGN KEY (member_id) REFERENCES users(id),
+    CONSTRAINT fk_coupons_trainer_id FOREIGN KEY (trainer_id) REFERENCES users(id),
+    CONSTRAINT ck_coupons_coupon_status CHECK (coupon_status IN ('NOT_USED', 'APPLICATION', 'COMPLETE', 'EXPIRED'))
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci; 
+
+CREATE TABLE IF NOT EXISTS `member_forms`(
+	id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    member_id BIGINT NOT NULL,
+    is_submit BOOLEAN DEFAULT FALSE,
+    bodyform VARCHAR(30) NOT NULL,
+    goal VARCHAR(30) NOT NULL,
+    bmi VARCHAR(30) NOT NULL,
+    improved_part VARCHAR(30) NOT NULL,
+    preferred_diet VARCHAR(30) NOT NULL,
+    sugar_intake VARCHAR(30) NOT NULL,
+    water_intake VARCHAR(30) NOT NULL,
+    height TINYINT UNSIGNED NOT NULL,
+	weight TINYINT UNSIGNED NOT NULL,
+    weight_goal TINYINT UNSIGNED NOT NULL,
+    physical_level TINYINT UNSIGNED NOT NULL,
+    exercising_problem VARCHAR(30) NOT NULL,
+    pushup_level VARCHAR(30) NOT NULL,
+    pullup_level VARCHAR(30) NOT NULL,
+    exercise_frequency VARCHAR(30) NOT NULL,
+    investable_time VARCHAR(30) NOT NULL,
+    
+    CONSTRAINT fk_member_forms_member_id FOREIGN KEY (member_id) REFERENCES members (id),
+    CONSTRAINT ck_member_forms_bodyform CHECK (bodyform IN ('SLIM', 'NORMAL', 'FAT')),
+    CONSTRAINT ck_member_forms_goal CHECK (goal IN ('DIET', 'IMPROVEMENT_OF_MUSCLE', 'PERFORMANCE')),
+    CONSTRAINT ck_member_forms_bmi CHECK (bmi IN ('LESS_18', 'BETWEEN_18TO23', 'BETWEEN_23TO25', 'MORE_25')),
+    CONSTRAINT ck_member_forms_improved_part CHECK (improved_part IN ('CHEST', 'ARM', 'STOMACH', 'LEG', 'NOT_APPLICABLE')),
+    CONSTRAINT ck_member_forms_preferred_diet CHECK (preferred_diet IN ('VEGETARIAN', 'VEGAN', 'KITO', 'MEDITERRANEAN', 'CARNIVORE', 'NOT_APPLICABLE')),
+    CONSTRAINT ck_member_forms_sugar_intake CHECK (sugar_intake IN ('DONT_OFTEN', 'WEEK_3TO5', 'EVERYDAY')),
+    CONSTRAINT ck_member_forms_water_intake CHECK (water_intake IN ('COFFEE_TEA', 'LESS_2', 'BETWEEN_2TO6', 'BETWEEN_7TO10', 'MORE_10')),
+    CONSTRAINT ck_member_forms_exercising_problem CHECK (exercising_problem IN ('MOTIVATION', 'EFFECT', 'HARD', 'PLAN', 'COACHING', 'NOT_APPLICABLE')),
+	CONSTRAINT ck_member_forms_pushup_level CHECK (pushup_level IN ('LESS_5', 'BETWEEN_5TO10', 'MORE_10')),
+    CONSTRAINT ck_member_forms_pullup_level CHECK (pullup_level IN ('LESS_5', 'BEWEENT_5TO10', 'MORE_10')),
+    CONSTRAINT ck_member_forms_exercise_frequency CHECK (exercise_frequency IN ('NEVER', 'WEEK_1TO2', 'WEEK_3', 'MORE_WEEK_3')),
+    CONSTRAINT ck_member_forms_investable_time CHECK (investable_time IN ('MIN30', 'MIN40', 'HOUR1', 'FREEDOM'))
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `upload_files` (
