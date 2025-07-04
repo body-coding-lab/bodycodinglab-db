@@ -170,7 +170,7 @@ CREATE TABLE IF NOT EXISTS `upload_files` (
     original_name VARCHAR(255) NOT NULL,
     file_name VARCHAR(255) NOT NULL,
     file_path VARCHAR(500) NOT NULL,
-    file_type VARCHAR(100),
+    file_type VARCHAR(100) NOT NULL,
     file_size BIGINT NOT NULL,
     target_id BIGINT NOT NULL,
     target_type VARCHAR(30) NOT NULL,
