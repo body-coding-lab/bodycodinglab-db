@@ -113,7 +113,7 @@ CREATE TABLE IF NOT EXISTS `one_day_tickets` (
     
     CONSTRAINT fk_one_day_tickets_member_id FOREIGN KEY (member_id) REFERENCES users(id),
     CONSTRAINT fk_one_day_tickets_trainer_id FOREIGN KEY (trainer_id) REFERENCES users(id),
-    CONSTRAINT ck_one_day_tickets_status CHECK (status IN ('ISSUED', 'USED', 'CANCELLED'))
+    CONSTRAINT ck_one_day_tickets_status CHECK (status IN ('ISSUED', 'USED', 'CANCELED'))
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `coupons`(
@@ -174,7 +174,6 @@ CREATE TABLE IF NOT EXISTS `upload_files` (
     file_size BIGINT NOT NULL,
     target_id BIGINT NOT NULL,
     target_type VARCHAR(30) NOT NULL,
-    license_id BIGINT,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
