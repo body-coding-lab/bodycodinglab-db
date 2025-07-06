@@ -123,7 +123,7 @@ CREATE TABLE IF NOT EXISTS `match_waiting_list`(
     reject_response TEXT,
     
     CONSTRAINT uq_match_waiting_list_member_id UNIQUE (member_id),
-    CONSTRAINT fk_match_waiting_list_member_id FOREIGN KEY (member_id) REFERENCES user(id) ON DELETE CASCADE,
+    CONSTRAINT fk_match_waiting_list_member_id FOREIGN KEY (member_id) REFERENCES users(id) ON DELETE CASCADE,
     CONSTRAINT fk_match_waiting_list_trainer_id FOREIGN KEY (trainer_id) REFERENCES users(id) ON DELETE CASCADE,
     CONSTRAINT ck_match_waiting_list_approved_status CHECK (approved_status IN ('NOT_APPROVED', 'APPROVED', 'REJECT'))
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
