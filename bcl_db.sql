@@ -53,6 +53,48 @@ CREATE TABLE IF NOT EXISTS `subscriptions`(
     CONSTRAINT fk_subscriptions_member_id FOREIGN KEY (member_id) REFERENCES members(id)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `trainers` (
+	id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    user_id BIGINT NOT NULL,
+    job_address VARCHAR(255) NOT NULL,
+    attachment_file_id BIGINT,
+    short_introduce VARCHAR(150),
+    long_introduce TEXT,
+    status VARCHAR(20) NOT NULL,
+    education_name VARCHAR(100),
+    education_entrance VARCHAR(10),
+    education_graduate VARCHAR(10),
+	created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+	CONSTRAINT fk_trainers_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT ck_trainers_status CHECK (status IN ('PENDING', 'APPROVED', 'REJECTED'))
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `trainer_careers` (
+	id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    trainer_id BIGINT NOT NULL,
+    company_name VARCHAR(50) NOT NULL,
+    company_join DATE NOT NULL,
+    company_quit DATE NOT NULL,
+	created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    CONSTRAINT fk_trainer_careers_trainer_id FOREIGN KEY (trainer_id) REFERENCES trainers(id) ON DELETE CASCADE
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `trainer_licenses` (
+	id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    trainer_id BIGINT NOT NULL,
+    license_type VARCHAR(50) NOT NULL,
+    license_name DATE NOT NULL,
+	created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    CONSTRAINT fk_trainer_licenses_trainer_id FOREIGN KEY (trainer_id) REFERENCES trainers(id) ON DELETE CASCADE,
+	CONSTRAINT ck_trainer_license_type CHECK (license_type IN ('LICENSE', 'CERTIFICATE', 'AWARD_DETAIL'))
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS `payments`(
 	id BIGINT PRIMARY KEY AUTO_INCREMENT,
     payment_key VARCHAR(255), 
@@ -97,6 +139,23 @@ CREATE TABLE IF NOT EXISTS `matches`(
     CONSTRAINT uq_matches_member_id_trainer_id UNIQUE (member_id, trainer_id),
     CONSTRAINT fk_matches_member_id FOREIGN KEY (member_id) REFERENCES users(id) ON DELETE CASCADE,
     CONSTRAINT fk_matches_trainer_id FOREIGN KEY (trainer_id) REFERENCES users(id) ON DELETE CASCADE
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `boards` (
+	id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    match_id BIGINT NOT NULL,
+    category VARCHAR(20) NOT NULL,
+    post_title VARCHAR(100) NOT NULL,
+    post_content TEXT NOT NULL,
+    writer_id BIGINT NOT NULL,
+    view_count BIGINT NOT NULL DEFAULT 0,
+	post_like BIGINT NOT NULL DEFAULT 0,
+	created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+	CONSTRAINT fk_boards_match_id FOREIGN KEY (match_id) REFERENCES matches(id) ON DELETE CASCADE,
+	CONSTRAINT fk_boards_writer_id FOREIGN KEY (writer_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT ck_boards_category CHECK (status IN ('MEAL', 'ROUTINE', 'COMMUNITY'))
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `one_day_tickets` (
@@ -200,7 +259,7 @@ CREATE TABLE IF NOT EXISTS `trainer_status_logs` (
     change_reason VARCHAR(255),
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     
-    CONSTRAINT fk_trainer_status_logs_trainer_id FOREIGN KEY (trainer_id) REFERENCES trainers(id),
+    CONSTRAINT fk_trainer_status_logs_trainer_id FOREIGN KEY (trainer_id) REFERENCES trainers(id) ON DELETE SET NULL,
     CONSTRAINT fk_trainer_status_logs_changed_by FOREIGN KEY (changed_by) REFERENCES users(id),
     CONSTRAINT ck_trainer_status_logs_prev_status CHECK (prev_status IN ('PENDING', 'APPROVED', 'REJECTED')),
     CONSTRAINT ck_trainer_status_logs_new_status CHECK (new_status IN ('PENDING', 'APPROVED', 'REJECTED'))
