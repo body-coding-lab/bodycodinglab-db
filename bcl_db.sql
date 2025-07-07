@@ -155,13 +155,25 @@ CREATE TABLE IF NOT EXISTS `boards` (
     
 	CONSTRAINT fk_boards_match_id FOREIGN KEY (match_id) REFERENCES matches(id) ON DELETE CASCADE,
 	CONSTRAINT fk_boards_writer_id FOREIGN KEY (writer_id) REFERENCES users(id) ON DELETE CASCADE,
-    CONSTRAINT ck_boards_category CHECK (status IN ('MEAL', 'ROUTINE', 'COMMUNITY'))
+    CONSTRAINT ck_boards_category CHECK (category IN ('MEAL', 'ROUTINE', 'COMMUNITY'))
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `board_comments` (
+	id BIGINT PRIMARY KEY AUTO_INCREMENT,
+	board_id BIGINT NOT NULL,
+    commenter_id BIGINT NOT NULL,
+    content TEXT NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    CONSTRAINT 	fk_boards_comments_board_id FOREIGN KEY (board_id) REFERENCES boards(id) ON DELETE CASCADE,
+    CONSTRAINT 	fk_boards_comments_commenter_id FOREIGN KEY (commenter_id) REFERENCES users(id) ON DELETE CASCADE
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `one_day_tickets` (
 	id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    member_id BIGINT NOT NULL,
-    trainer_id BIGINT NOT NULL,
+    member_id BIGINT,
+    trainer_id BIGINT,
     issued_at DATE NOT NULL,
     used_at DATE,
     canceled_at DATE,
@@ -170,8 +182,8 @@ CREATE TABLE IF NOT EXISTS `one_day_tickets` (
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
-    CONSTRAINT fk_one_day_tickets_member_id FOREIGN KEY (member_id) REFERENCES users(id),
-    CONSTRAINT fk_one_day_tickets_trainer_id FOREIGN KEY (trainer_id) REFERENCES users(id),
+    CONSTRAINT fk_one_day_tickets_member_id FOREIGN KEY (member_id) REFERENCES users(id) ON DELETE SET NULL,
+    CONSTRAINT fk_one_day_tickets_trainer_id FOREIGN KEY (trainer_id) REFERENCES users(id) ON DELETE SET NULL,
     CONSTRAINT ck_one_day_tickets_status CHECK (status IN ('ISSUED', 'USED', 'CANCELED'))
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -247,6 +259,10 @@ CREATE TABLE IF NOT EXISTS `upload_files` (
 ALTER TABLE `users`
 ADD CONSTRAINT fk_users_profile_image_id
 FOREIGN KEY (profile_image_id) REFERENCES upload_files(id);
+
+ALTER TABLE `trainers`
+ADD CONSTRAINT fk_trainers_attachment_file_id
+FOREIGN KEY (attachment_file_id) REFERENCES upload_files(id);
 
 CREATE TABLE IF NOT EXISTS `trainer_status_logs` (
 	id BIGINT PRIMARY KEY AUTO_INCREMENT,
