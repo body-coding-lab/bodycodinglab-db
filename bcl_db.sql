@@ -250,17 +250,17 @@ FOREIGN KEY (profile_image_id) REFERENCES upload_files(id);
 
 CREATE TABLE IF NOT EXISTS `trainer_status_logs` (
 	id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    trainer_id BIGINT NOT NULL,
+    trainer_id BIGINT,
     username VARCHAR(20) NOT NULL,
     prev_status VARCHAR(20) NOT NULL,
     new_status VARCHAR(20) NOT NULL,
-    changed_by BIGINT NOT NULL,
+    changed_by BIGINT,
     changed_by_username VARCHAR(20) NOT NULL,
     change_reason VARCHAR(255),
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     
     CONSTRAINT fk_trainer_status_logs_trainer_id FOREIGN KEY (trainer_id) REFERENCES trainers(id) ON DELETE SET NULL,
-    CONSTRAINT fk_trainer_status_logs_changed_by FOREIGN KEY (changed_by) REFERENCES users(id),
+    CONSTRAINT fk_trainer_status_logs_changed_by FOREIGN KEY (changed_by) REFERENCES users(id) ON DELETE SET NULL,
     CONSTRAINT ck_trainer_status_logs_prev_status CHECK (prev_status IN ('PENDING', 'APPROVED', 'REJECTED')),
     CONSTRAINT ck_trainer_status_logs_new_status CHECK (new_status IN ('PENDING', 'APPROVED', 'REJECTED'))
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
