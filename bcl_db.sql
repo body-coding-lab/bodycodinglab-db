@@ -141,6 +141,17 @@ CREATE TABLE IF NOT EXISTS `matches`(
     CONSTRAINT fk_matches_trainer_id FOREIGN KEY (trainer_id) REFERENCES users(id) ON DELETE CASCADE
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `notes`(
+	id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    note_text TEXT NOT NULL,
+    note_writer BIGINT NOT NULL,
+    note_receiver BIGINT NOT NULL,
+    created_at 	DATETIME DEFAULT CURRENT_TIMESTAMP,
+    
+    CONSTRAINT fk_notes_note_writer FOREIGN KEY (note_writer) REFERENCES users(id),
+    CONSTRAINT fk_notes_note_receiver FOREIGN KEY (note_receiver) REFERENCES users(id)
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS `boards` (
 	id BIGINT PRIMARY KEY AUTO_INCREMENT,
     match_id BIGINT NOT NULL,
