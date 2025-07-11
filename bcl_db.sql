@@ -173,12 +173,15 @@ CREATE TABLE IF NOT EXISTS `board_comments` (
 	id BIGINT PRIMARY KEY AUTO_INCREMENT,
 	board_id BIGINT NOT NULL,
     commenter_id BIGINT NOT NULL,
+    parent_id BIGINT,
     content TEXT NOT NULL,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
-    CONSTRAINT 	fk_boards_comments_board_id FOREIGN KEY (board_id) REFERENCES boards(id) ON DELETE CASCADE,
-    CONSTRAINT 	fk_boards_comments_commenter_id FOREIGN KEY (commenter_id) REFERENCES users(id) ON DELETE CASCADE
+    CONSTRAINT fk_boards_comments_board_id FOREIGN KEY (board_id) REFERENCES boards(id) ON DELETE CASCADE,
+    CONSTRAINT fk_boards_comments_commenter_id FOREIGN KEY (commenter_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_boards_comments_parent_id FOREIGN KEY (parent_id) REFERENCES board_comments(id) ON DELETE SET NULL
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `one_day_tickets` (
