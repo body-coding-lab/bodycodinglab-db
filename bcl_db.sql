@@ -39,6 +39,9 @@ CREATE TABLE IF NOT EXISTS `members`(
     member_address VARCHAR(255) NOT NULL,
     one_day_ticket_count TINYINT DEFAULT 3,
     member_status VARCHAR(30) NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updaetd_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
     
     CONSTRAINT fk_members_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     CONSTRAINT ck_members_member_status CHECK (member_status IN ('NOT_SUBSCRIPTION', 'SUBSCRIPTION'))
@@ -48,7 +51,8 @@ CREATE TABLE IF NOT EXISTS `subscriptions`(
 	id BIGINT PRIMARY KEY AUTO_INCREMENT,
     member_id BIGINT NOT NULL,
     price INT NOT NULL,
-    payment_date DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updaetd_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
     CONSTRAINT fk_subscriptions_member_id FOREIGN KEY (member_id) REFERENCES members(id)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -104,6 +108,8 @@ CREATE TABLE IF NOT EXISTS `payments`(
     payment_method VARCHAR(50) NOT NULL,
     member_id BIGINT NOT NULL,
     subscription_id BIGINT,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updaetd_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	
     CONSTRAINT uq_payments_payment_key UNIQUE (payment_key),
     CONSTRAINT uq_payments_order_id UNIQUE (order_id),
@@ -118,9 +124,10 @@ CREATE TABLE IF NOT EXISTS `match_waiting_list`(
 	id BIGINT PRIMARY KEY AUTO_INCREMENT,
     member_id BIGINT NOT NULL,
     trainer_id BIGINT NOT NULL,
-    applied_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     approved_status VARCHAR(50) NOT NULL,
     reject_response TEXT,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updaetd_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
     CONSTRAINT uq_match_waiting_list_member_id UNIQUE (member_id),
     CONSTRAINT fk_match_waiting_list_member_id FOREIGN KEY (member_id) REFERENCES users(id) ON DELETE CASCADE,
@@ -132,8 +139,9 @@ CREATE TABLE IF NOT EXISTS `matches`(
 	id BIGINT PRIMARY KEY AUTO_INCREMENT,
     member_id BIGINT NOT NULL,
     trainer_id BIGINT NOT NULL,
-    match_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     is_maintained BOOLEAN DEFAULT TRUE,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updaetd_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
     CONSTRAINT uq_matches_member_id UNIQUE (member_id),
     CONSTRAINT uq_matches_member_id_trainer_id UNIQUE (member_id, trainer_id),
@@ -146,8 +154,9 @@ CREATE TABLE IF NOT EXISTS `notes`(
     note_text TEXT NOT NULL,
     note_writer BIGINT NOT NULL,
     note_receiver BIGINT NOT NULL,
-    created_at 	DATETIME DEFAULT CURRENT_TIMESTAMP,
     is_read BOOLEAN DEFAULT FALSE,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updaetd_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
     CONSTRAINT fk_notes_note_writer FOREIGN KEY (note_writer) REFERENCES users(id),
     CONSTRAINT fk_notes_note_receiver FOREIGN KEY (note_receiver) REFERENCES users(id)
@@ -206,6 +215,8 @@ CREATE TABLE IF NOT EXISTS `coupons`(
 	expiration_period DATE NOT NULL,
     used_date TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     coupon_status VARCHAR(50) NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
     CONSTRAINT fk_coupons_member_id FOREIGN KEY (member_id) REFERENCES users(id),
     CONSTRAINT fk_coupons_trainer_id FOREIGN KEY (trainer_id) REFERENCES users(id),
@@ -232,6 +243,8 @@ CREATE TABLE IF NOT EXISTS `member_forms`(
     pullup_level VARCHAR(30) NOT NULL,
     exercise_frequency VARCHAR(30) NOT NULL,
     investable_time VARCHAR(30) NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
     CONSTRAINT fk_member_forms_member_id FOREIGN KEY (member_id) REFERENCES members (id),
     CONSTRAINT ck_member_forms_bodyform CHECK (bodyform IN ('SLIM', 'NORMAL', 'FAT')),
