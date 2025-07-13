@@ -147,6 +147,7 @@ CREATE TABLE IF NOT EXISTS `notes`(
     note_writer BIGINT NOT NULL,
     note_receiver BIGINT NOT NULL,
     created_at 	DATETIME DEFAULT CURRENT_TIMESTAMP,
+    is_read BOOLEAN DEFAULT FALSE,
     
     CONSTRAINT fk_notes_note_writer FOREIGN KEY (note_writer) REFERENCES users(id),
     CONSTRAINT fk_notes_note_receiver FOREIGN KEY (note_receiver) REFERENCES users(id)
