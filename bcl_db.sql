@@ -142,8 +142,7 @@ CREATE TABLE IF NOT EXISTS `matches`(
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
-    CONSTRAINT uq_matches_member_id UNIQUE (member_id),
-    CONSTRAINT uq_matches_member_id_trainer_id UNIQUE (member_id, trainer_id),
+
     CONSTRAINT fk_matches_member_id FOREIGN KEY (member_id) REFERENCES users(id) ON DELETE CASCADE,
     CONSTRAINT fk_matches_trainer_id FOREIGN KEY (trainer_id) REFERENCES users(id) ON DELETE CASCADE
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
