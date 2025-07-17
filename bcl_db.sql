@@ -321,3 +321,15 @@ JOIN
 	roles r ON u.role_id = r.id
 WHERE
 	r.name = 'TRAINER';
+    
+SELECT COUNT(*)
+FROM users u
+JOIN roles r ON u.role_id = r.id
+WHERE r.name = 'TRAINER';
+
+SELECT COUNT(*)
+FROM users u
+JOIN roles r ON u.role_id = r.id
+WHERE r.name = 'MEMBER';
+
+SELECT COUNT(*) FROM matches;
